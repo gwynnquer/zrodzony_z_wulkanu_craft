@@ -34,7 +34,6 @@ class GameWindowSettings():
         pygame.font.Font(font, 20)
 
     def set_background(self, background):
-
         image = pygame.image.load(background).convert()
         image = pygame.transform.smoothscale(image, self.screen.get_size())
         self.screen.blit(image, (0, 0))

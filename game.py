@@ -15,8 +15,10 @@ class Game():
         self.clock.tick(60)
 
         # odwołanie sie do display_manager.py i inicjacja wszystkich ustawień okna
-        self.screen = display_manager.GameWindowSettings()
+        self.screen = display_manager.GameWindowSettings().screen
         self.player = player_manager.MainPlayer('kwiat')
+
+        self.screen.blit(self.player.image, self.player.rect)
 
     def loop(self):
 
@@ -27,7 +29,10 @@ class Game():
                 pygame.quit()
                 exit()
 
-        self.player.image.blit(self.screen.screen, (0, 0))
+            # ruch gracza
+            self.player.moving(event)
+
+        # update
         pygame.display.update()
 
 
