@@ -1,5 +1,6 @@
 # own libraries
 import display_manager
+import city
 import player_manager
 
 # external libraries
@@ -17,12 +18,19 @@ class Game():
         self.running, self.playing = True, True
         self.dt, self.prev_time = 0, 0
 
+        self.state_stack = []
+
         # odwołanie sie do display_manager.py i inicjacja wszystkich ustawień okna
         self.screen = display_manager.GameWindowSettings().screen
         self.player = player_manager.MainPlayer('kwiat')
+        self.khorinis = city.Khorinis()
 
         self.actions = {"left": False, "right": False, "up": False,
                         "down": False, "action1": False, "action2": False, "start": False}
+
+        # zapewne tymczasowe wrzucenie khorinis do kolejki, potem bedzie tutja wiecej
+
+        self.state_stack.append(self.khorinis)
 
     def game_loop(self):
 
@@ -89,9 +97,16 @@ class Game():
 
     def update(self):
 
+        # .image state_stacku, którym np. jest khorinis
+        self.screen.blit(self.state_stack[-1].image, (0, 0))
+
+        # rozpoznanie akcji i zmienienie pozycji
         self.player.get_actions(self.actions)
-        self.screen.blit()
+
+        # blit gracza
         self.screen.blit(self.player.image, self.player.rect)
+
+        # update okna
         pygame.display.update()
 
     def reset_keys(self):
