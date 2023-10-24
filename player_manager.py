@@ -1,7 +1,8 @@
 # own libraries
+import display_manager
 import entity
 
-# public libraries
+# external libraries
 import pygame
 
 
@@ -20,36 +21,36 @@ class MainPlayer(entity.Entity):
 
     def __init__(self, player_name):
 
-        self.player = self.PLAYERS[player_name]
-
-        print(self.player['stats'])
-        self.stats = super().__init__(stats=self.player['stats'])
-
-        print(self.stats)
-
-        self.load = pygame.image.load(self.player['image']).convert_alpha()
-
-        player_height, player_width = self.load.get_size()
-
-        self.image = pygame.transform.smoothscale(
-            self.load,
-            (player_height/12, player_width/12)
+        super().__init__(
+            image=self.PLAYERS[player_name]['image'],
+            stats=self.PLAYERS[player_name]['stats'],
+            gravity=True,
         )
 
-        self.rect = self.image.get_rect()
+        self.left_pressed, self.right_pressed, self.jumping = False, False, False
 
-    def moving(self, event):
+    # przypisanie akcji gracza do działania
+    def get_actions(self, actions):
+        # akcje ruchu
 
-        if event.type == pygame.KEYDOWN:
-            print(event)
-            if event.key == ord('a'):
-                self.rect.x -= self.stats.ms
-                print(self.rect.x)
-            if event.key == ord('d'):
-                self.rect.x += self.stats.ms
+        self.left_pressed = actions['left']
+        self.right_pressed = actions['right']
+        self.jumping = actions['up']
 
-        if event.type == pygame.KEYUP:
-            if event.key == ord('a'):
-                self.rect.x -= self.stats.ms
-            if event.key == ord('b'):
-                self.rect.x += self.stats.ms
+        self.update_movement()
+
+    # ruch gracza
+    def update_movement(self, ):
+        self.vel_x = 0
+        self.vel_y = 0
+
+        if self.left_pressed and not self.right_pressed:
+            self.vel_x = -self.ms
+        if self.right_pressed and not self.left_pressed:
+            self.vel_x = self.ms
+        if self.jumping and self.rect.bottom == display_manager.GameWindowSettings.WINDOW_HEIGHT:
+            self.vel_y = -self.jump
+            self.jumping = False
+
+        self.rect.x += self.vel_x
+        self.rect.y += self.vel_y

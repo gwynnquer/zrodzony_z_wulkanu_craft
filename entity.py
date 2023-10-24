@@ -1,13 +1,28 @@
+# external libraries
 import pygame
 
 
-class Entity():
+class Entity(pygame.sprite.Sprite):
+    DEFAULT_IMAGE_HEIGHT = 141
+    DEFAULT_IMAGE_WIDTH = 100
+    GRAVITY = 1
 
-    def __init__(self, stats):
+    def __init__(self, image, stats, gravity=False):
 
         self.str, self.dex, self.con = stats
+        self.str_mod, self.str_dex, self.str_con = self.get_bonus(
+            self.str), self.get_bonus(self.dex), self.get_bonus(self.con)
 
-        self.ms = 30 + self.get_bonus(self.dex)
+        self.gravity = gravity
+
+        self.jump = 5 + self.str_mod
+        self.ms = (30 + self.str_dex) / 30
+
+        self.image = pygame.transform.smoothscale(
+            pygame.image.load(image).convert_alpha(), (self.DEFAULT_IMAGE_WIDTH, self.DEFAULT_IMAGE_HEIGHT))
+        self.rect = self.image.get_rect()
+
+        super().__init__()
 
     def get_bonus(self, stat):
         return int((stat-10)/2)
