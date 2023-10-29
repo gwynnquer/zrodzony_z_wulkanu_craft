@@ -32,13 +32,14 @@ class MainPlayer(entity.Entity):
         self.wall = display_manager.GameWindowSettings.WINDOW_WIDTH
 
         # czy klawisze wcisneite
-        self.left_pressed, self.right_pressed, self.jumping = False, False, False
+        self.left_pressed, self.right_pressed, self.up_pressed, self.jumping = False, False, False, False
 
         # ustawienie gracza na mapie
         self.rect.y = self.floor - self.rect.height
         self.rect.x = 0
+
         self.on_ground = True
-        self.vel_y = 0
+        self.distance_jumped, self.vel_y = 0, 0
 
     # przypisanie akcji gracza do działania
     def get_actions(self, actions):
@@ -46,31 +47,45 @@ class MainPlayer(entity.Entity):
 
         self.left_pressed = actions['left']
         self.right_pressed = actions['right']
-        self.jumping = actions['up']
+        self.up_pressed = actions['up']
 
         self.update_movement()
 
     # ruch gracza
-    def update_movement(self, ):
+    def update_movement(self):
         self.vel_x = 0
 
+        # grawitacja
         if not self.jumping:
             self.apply_gravity()
 
+        # prawo lewo
         if self.left_pressed and not self.right_pressed:
             self.vel_x = -self.ms
         if self.right_pressed and not self.left_pressed:
             self.vel_x = self.ms
-        if self.jumping and self.on_ground:
-            self.vel_y = -self.jump
-            self.jumping = False
-            self.on_ground = False
 
+        # skakanie
+        if self.up_pressed and not self.jumping and self.on_ground:
+            self.vel_y = -self.jump
+            self.on_ground = False
+            self.jumping = True
+            self.up_pressed = False
+        elif not self.up_pressed:
+            self.jumping = False
+
+        self.distance_jumped += self.vel_y
+
+        if self.distance_jumped <= 250 * -self.jump:
+            self.jumping = False
+
+        print(self.distance_jumped)
+        print(50 * -self.jump)
+        # zmienianie pozycji gracza
         self.rect.x += self.vel_x
         self.rect.y += self.vel_y
 
-        print(self.vel_y)
-
+        # na sam koniec korekta ruchu w krytycznych przypadkach
         self.correct_movement()
 
     def apply_gravity(self):
@@ -83,15 +98,20 @@ class MainPlayer(entity.Entity):
         self.pass_left = False
         self.pass_right = False
 
+        # skakanie
         if self.rect.bottom >= self.floor or self.on_ground == True:
             self.rect.bottom = self.floor
-            self.vel_y = 0
             self.on_ground = True
+            self.jumping = False
+            self.vel_y = 0
+            self.distance_jumped = 0
 
+        # prawo
         if self.rect.left > self.wall + 10:
             self.rect.right = 0
             self.pass_left = True
 
+        # lewo
         if self.rect.right < -10:
             self.rect.left = self.wall
             self.pass_right = True
