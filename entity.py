@@ -5,7 +5,7 @@ import pygame
 class Entity(pygame.sprite.Sprite):
     DEFAULT_IMAGE_HEIGHT = 141
     DEFAULT_IMAGE_WIDTH = 100
-    GRAVITY = 1
+    GRAVITY = 0.1
 
     def __init__(self, image, stats, gravity=False):
 
@@ -15,7 +15,10 @@ class Entity(pygame.sprite.Sprite):
 
         self.gravity = gravity
 
-        self.jump = 5 + self.str_mod
+        self.jump = self.str_mod + 1
+        if self.jump <= 0:
+            self.jump = 1.5
+
         self.ms = (30 + self.str_dex) / 30
 
         self.image = pygame.transform.smoothscale(
