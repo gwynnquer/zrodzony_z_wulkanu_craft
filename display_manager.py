@@ -14,10 +14,11 @@ class GameWindowSettings():
         self.set_screen(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self.set_game_name(self.GAME_NAME)
         self.set_icon(self.ICON)
-        self.set_font(self.FONT)
+        self.set_font(self.FONT, 20)
 
     def set_screen(self, height, width):
         self.screen = pygame.display.set_mode((height, width))
+        self.display = pygame.Surface((height, width))
 
     def set_game_name(self, game_name):
         pygame.display.set_caption(game_name)
@@ -27,5 +28,5 @@ class GameWindowSettings():
         icon = pygame.transform.smoothscale(icon, (32, 32))
         pygame.display.set_icon(icon)
 
-    def set_font(self, font):
-        pygame.font.Font(font, 20)
+    def set_font(self, font, size):
+        pygame.font.Font(font, size)
